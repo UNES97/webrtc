@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC Video/Audio Calling App</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>WebRTC Calling App</h1>
+            <div id="userStatus" class="user-status">
+                <span id="currentUser">Not logged in</span>
+                <button id="logoutBtn" style="display: none;">Logout</button>
+            </div>
+        </header>
+
+        <div id="loginSection" class="section">
+            <h2>Join the App</h2>
+            <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20">
+            <button id="joinBtn">Join</button>
+        </div>
+
+        <div id="mainSection" class="section" style="display: none;">
+            <div class="left-panel">
+                <div class="users-section">
+                    <h3>Online Users</h3>
+                    <div id="usersList" class="users-list"></div>
+                </div>
+                
+                <div class="call-logs-section">
+                    <h3>Recent Calls</h3>
+                    <button id="refreshLogsBtn">Refresh</button>
+                    <div id="callLogsList" class="call-logs"></div>
+                </div>
+            </div>
+
+            <div class="right-panel">
+                <div class="video-section">
+                    <div class="video-container">
+                        <video id="localVideo" autoplay muted playsinline></video>
+                        <video id="remoteVideo" autoplay playsinline></video>
+                    </div>
+                    
+                    <div class="call-controls">
+                        <button id="toggleVideo" class="control-btn video-btn">
+                            <span>📹</span>
+                        </button>
+                        <button id="toggleAudio" class="control-btn audio-btn">
+                            <span>🎤</span>
+                        </button>
+                        <button id="endCallBtn" class="control-btn end-btn" style="display: none;">
+                            <span>📞</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Incoming Call Modal -->
+        <div id="incomingCallModal" class="modal" style="display: none;">
+            <div class="modal-content">
+                <h3>Incoming Call</h3>
+                <p><span id="callerName"></span> is calling you</p>
+                <p>Call type: <span id="callType"></span></p>
+                <div class="modal-buttons">
+                    <button id="acceptCallBtn" class="accept-btn">Accept</button>
+                    <button id="rejectCallBtn" class="reject-btn">Reject</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call Status -->
+        <div id="callStatus" class="call-status" style="display: none;">
+            <span id="callStatusText">Calling...</span>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
