@@ -4,57 +4,142 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WebRTC Video/Audio Calling App</title>
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/simple-peer@9.11.1/simplepeer.min.js"></script>
 </head>
-<body>
-    <div class="container">
-        <header>
-            <h1>WebRTC Calling App</h1>
-            <div id="userStatus" class="user-status">
-                <span id="currentUser">Not logged in</span>
-                <button id="logoutBtn" style="display: none;">Logout</button>
+<body class="bg-gray-50 font-inter min-h-screen">
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-2xl font-bold text-gray-900">WebRTC Call</h1>
+                        </div>
+                    </div>
+                    <div id="userStatus" class="flex items-center space-x-4">
+                        <span id="currentUser" class="text-sm text-gray-500">Not logged in</span>
+                        <button id="logoutBtn" class="hidden bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors duration-200">
+                            Logout
+                        </button>
+                    </div>
+                </div>
             </div>
         </header>
 
-        <div id="loginSection" class="section">
-            <h2>Join the App</h2>
-            <input type="text" id="usernameInput" placeholder="Enter your username" maxlength="20">
-            <button id="joinBtn">Join</button>
-        </div>
-
-        <div id="mainSection" class="section" style="display: none;">
-            <div class="left-panel">
-                <div class="users-section">
-                    <h3>Online Users</h3>
-                    <div id="usersList" class="users-list"></div>
+        <!-- Login Section -->
+        <div id="loginSection" class="flex items-center justify-center min-h-screen px-4">
+            <div class="max-w-md w-full space-y-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold text-gray-900 mb-2">Welcome!</h2>
+                    <p class="text-gray-600">Enter your username to start calling</p>
                 </div>
-                
-                <div class="call-logs-section">
-                    <h3>Recent Calls</h3>
-                    <button id="refreshLogsBtn">Refresh</button>
-                    <div id="callLogsList" class="call-logs"></div>
+                <div class="bg-white p-8 rounded-2xl shadow-lg border border-gray-200">
+                    <div class="space-y-6">
+                        <div>
+                            <input type="text" id="usernameInput" 
+                                   placeholder="Enter your username" 
+                                   maxlength="20"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all duration-200 text-gray-900">
+                        </div>
+                        <button id="joinBtn" 
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 px-4 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                            Join App
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="right-panel">
-                <div class="video-section">
-                    <div class="video-container">
-                        <video id="localVideo" autoplay muted playsinline></video>
-                        <video id="remoteVideo" autoplay playsinline></video>
-                    </div>
+        <!-- Main Section -->
+        <div id="mainSection" class="section" style="display: none;">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     
-                    <div class="call-controls">
-                        <button id="toggleVideo" class="control-btn video-btn">
-                            <span>📹</span>
-                        </button>
-                        <button id="toggleAudio" class="control-btn audio-btn">
-                            <span>🎤</span>
-                        </button>
-                        <button id="endCallBtn" class="control-btn end-btn" style="display: none;">
-                            <span>📞</span>
-                        </button>
+                    <!-- Left Panel -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Online Users -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Online Users</h3>
+                                <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            </div>
+                            <div id="usersList" class="space-y-2"></div>
+                        </div>
+                        
+                        <!-- Call Logs -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold text-gray-900">Recent Calls</h3>
+                                <button id="refreshLogsBtn" 
+                                        class="text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors duration-200">
+                                    Refresh
+                                </button>
+                            </div>
+                            <div id="callLogsList" class="space-y-2"></div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Video Section -->
+                    <div class="lg:col-span-2">
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-200 overflow-hidden">
+                            <!-- Video Container -->
+                            <div class="relative bg-gray-900 aspect-video">
+                                <video id="localVideo" 
+                                       autoplay muted playsinline
+                                       class="absolute top-4 right-4 w-32 h-24 bg-gray-800 rounded-lg border-2 border-white shadow-lg z-10 object-cover">
+                                </video>
+                                <video id="remoteVideo" 
+                                       autoplay playsinline
+                                       class="w-full h-full object-cover bg-gray-800">
+                                </video>
+                                <!-- Placeholder when no video -->
+                                <div class="absolute inset-0 flex items-center justify-center text-gray-400 bg-gray-900">
+                                    <div class="text-center">
+                                        <div class="text-6xl mb-4">📹</div>
+                                        <p class="text-lg">Ready to connect</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Call Controls -->
+                            <div class="bg-gray-50 p-6">
+                                <div class="flex items-center justify-center space-x-4">
+                                    <button id="toggleVideo" 
+                                            class="bg-gray-700 hover:bg-gray-800 text-white p-3 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                                        </svg>
+                                    </button>
+                                    <button id="toggleAudio" 
+                                            class="bg-gray-700 hover:bg-gray-800 text-white p-3 rounded-full transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500">
+                                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
+                                        </svg>
+                                    </button>
+                                    <button id="endCallBtn" 
+                                            class="control-btn end-btn" style="display: none;">
+                                        <span>📞</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -62,20 +147,43 @@
 
         <!-- Incoming Call Modal -->
         <div id="incomingCallModal" class="modal" style="display: none;">
-            <div class="modal-content">
-                <h3>Incoming Call</h3>
-                <p><span id="callerName"></span> is calling you</p>
-                <p>Call type: <span id="callType"></span></p>
-                <div class="modal-buttons">
-                    <button id="acceptCallBtn" class="accept-btn">Accept</button>
-                    <button id="rejectCallBtn" class="reject-btn">Reject</button>
+            <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 transform transition-all duration-300">
+                    <div class="text-center">
+                        <div class="mb-4">
+                            <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">Incoming Call</h3>
+                        <p class="text-gray-600 mb-1">
+                            <span id="callerName" class="font-medium text-gray-900"></span> is calling you
+                        </p>
+                        <p class="text-sm text-gray-500 mb-6">
+                            Call type: <span id="callType" class="font-medium"></span>
+                        </p>
+                        <div class="modal-buttons flex space-x-4">
+                            <button id="rejectCallBtn" 
+                                    class="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 px-4 rounded-xl font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-red-500">
+                                Decline
+                            </button>
+                            <button id="acceptCallBtn" 
+                                    class="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 px-4 rounded-xl font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                Accept
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Call Status -->
         <div id="callStatus" class="call-status" style="display: none;">
-            <span id="callStatusText">Calling...</span>
+            <div class="fixed top-4 right-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 z-40">
+                <span id="callStatusText" class="text-sm font-medium text-gray-900">Calling...</span>
+            </div>
         </div>
     </div>
 
