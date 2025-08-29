@@ -148,17 +148,20 @@ async function startCall(targetUsername, callType) {
     });
     
     peer.on('stream', (stream) => {
+        console.log('Received remote stream:', stream);
         remoteStream = stream;
-        remoteVideo.srcObject = stream;
         
         // Show/hide video elements based on call type
         if (currentCall.type === 'video') {
+            remoteVideo.srcObject = stream;
             remoteVideo.style.display = 'block';
             // Ensure video plays (handle autoplay restrictions)  
             remoteVideo.play().catch(e => {
                 console.log('Autoplay prevented, user interaction required:', e);
             });
         } else {
+            // For audio calls, still set the stream but don't show video
+            remoteVideo.srcObject = stream;
             remoteVideo.style.display = 'none';
         }
         
@@ -204,17 +207,20 @@ async function answerCall(signal, caller, callType, callId) {
     });
     
     peer.on('stream', (stream) => {
+        console.log('Received remote stream:', stream);
         remoteStream = stream;
-        remoteVideo.srcObject = stream;
         
         // Show/hide video elements based on call type
         if (currentCall.type === 'video') {
+            remoteVideo.srcObject = stream;
             remoteVideo.style.display = 'block';
             // Ensure video plays (handle autoplay restrictions)
             remoteVideo.play().catch(e => {
                 console.log('Autoplay prevented, user interaction required:', e);
             });
         } else {
+            // For audio calls, still set the stream but don't show video
+            remoteVideo.srcObject = stream;
             remoteVideo.style.display = 'none';
         }
         
