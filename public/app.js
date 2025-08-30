@@ -100,26 +100,20 @@ function createUserElement(username, isMobile = false) {
     const userDiv = document.createElement('div');
     
     if (isMobile) {
-        userDiv.className = 'flex items-center justify-between p-2 bg-discord-light hover:bg-discord-accent/20 rounded transition-colors duration-200';
+        userDiv.className = 'flex items-center justify-between p-1.5 bg-discord-light hover:bg-discord-accent/20 rounded-md transition-colors duration-200';
         userDiv.innerHTML = `
             <div class="flex items-center space-x-2">
-                <div class="w-6 h-6 bg-discord-accent rounded-full flex items-center justify-center">
+                <div class="w-5 h-5 bg-discord-accent rounded-full flex items-center justify-center flex-shrink-0">
                     <i data-lucide="user" class="w-3 h-3 text-white stroke-2"></i>
                 </div>
-                <div>
-                    <span class="font-medium text-discord-text text-sm">${username}</span>
-                    <div class="flex items-center space-x-1">
-                        <div class="w-1.5 h-1.5 bg-discord-success rounded-full"></div>
-                        <span class="text-xs text-discord-success font-medium">online</span>
-                    </div>
-                </div>
+                <span class="font-medium text-discord-text text-xs truncate">${username}</span>
             </div>
-            <div class="flex space-x-1">
-                <button onclick="startCall('${username}', 'audio')" class="w-6 h-6 bg-discord-success hover:bg-green-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Audio Call">
-                    <i data-lucide="phone" class="w-3 h-3 stroke-2"></i>
+            <div class="flex space-x-1 flex-shrink-0">
+                <button onclick="startCall('${username}', 'audio')" class="w-5 h-5 bg-discord-success hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors duration-200" title="Audio">
+                    <i data-lucide="phone" class="w-2.5 h-2.5 stroke-2"></i>
                 </button>
-                <button onclick="startCall('${username}', 'video')" class="w-6 h-6 bg-discord-accent hover:bg-blue-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Video Call">
-                    <i data-lucide="video" class="w-3 h-3 stroke-2"></i>
+                <button onclick="startCall('${username}', 'video')" class="w-5 h-5 bg-discord-accent hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors duration-200" title="Video">
+                    <i data-lucide="video" class="w-2.5 h-2.5 stroke-2"></i>
                 </button>
             </div>
         `;
@@ -139,10 +133,10 @@ function createUserElement(username, isMobile = false) {
                 </div>
             </div>
             <div class="flex space-x-2">
-                <button onclick="startCall('${username}', 'audio')" class="w-8 h-8 bg-discord-success hover:bg-green-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Audio Call">
+                <button onclick="startCall('${username}', 'audio')" class="w-8 h-8 bg-discord-success hover:bg-green-600 text-white rounded-full flex items-center justify-center transition-colors duration-200" title="Audio Call">
                     <i data-lucide="phone" class="w-4 h-4 stroke-2"></i>
                 </button>
-                <button onclick="startCall('${username}', 'video')" class="w-8 h-8 bg-discord-accent hover:bg-blue-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Video Call">
+                <button onclick="startCall('${username}', 'video')" class="w-8 h-8 bg-discord-accent hover:bg-blue-600 text-white rounded-full flex items-center justify-center transition-colors duration-200" title="Video Call">
                     <i data-lucide="video" class="w-4 h-4 stroke-2"></i>
                 </button>
             </div>
@@ -372,15 +366,33 @@ function endCall() {
 
 function showCallControls() {
     endCallBtn.style.display = 'inline-block';
+    const endCallLabelContainer = document.getElementById('endCallLabelContainer');
+    if (endCallLabelContainer) {
+        endCallLabelContainer.classList.remove('hidden');
+    }
+    
     if (mobileEndCallBtn) {
         mobileEndCallBtn.style.display = 'inline-block';
+    }
+    const mobileEndCallLabelContainer = document.getElementById('mobileEndCallLabelContainer');
+    if (mobileEndCallLabelContainer) {
+        mobileEndCallLabelContainer.classList.remove('hidden');
     }
 }
 
 function hideCallControls() {
     endCallBtn.style.display = 'none';
+    const endCallLabelContainer = document.getElementById('endCallLabelContainer');
+    if (endCallLabelContainer) {
+        endCallLabelContainer.classList.add('hidden');
+    }
+    
     if (mobileEndCallBtn) {
         mobileEndCallBtn.style.display = 'none';
+    }
+    const mobileEndCallLabelContainer = document.getElementById('mobileEndCallLabelContainer');
+    if (mobileEndCallLabelContainer) {
+        mobileEndCallLabelContainer.classList.add('hidden');
     }
 }
 
