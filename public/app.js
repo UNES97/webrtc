@@ -16,6 +16,14 @@ const currentUserSpan = document.getElementById('currentUser');
 const logoutBtn = document.getElementById('logoutBtn');
 const localVideo = document.getElementById('localVideo');
 const remoteVideo = document.getElementById('remoteVideo');
+const mobileLocalVideo = document.getElementById('mobileLocalVideo');
+const mobileRemoteVideo = document.getElementById('mobileRemoteVideo');
+const mobileUsersList = document.getElementById('mobileUsersList');
+const mobileEmptyUsersState = document.getElementById('mobileEmptyUsersState');
+const mobileVideoPlaceholder = document.getElementById('mobileVideoPlaceholder');
+const mobileToggleVideo = document.getElementById('mobileToggleVideo');
+const mobileToggleAudio = document.getElementById('mobileToggleAudio');
+const mobileEndCallBtn = document.getElementById('mobileEndCallBtn');
 const toggleVideo = document.getElementById('toggleVideo');
 const toggleAudio = document.getElementById('toggleAudio');
 const endCallBtn = document.getElementById('endCallBtn');
@@ -28,6 +36,7 @@ const callStatus = document.getElementById('callStatus');
 const callStatusText = document.getElementById('callStatusText');
 const refreshLogsBtn = document.getElementById('refreshLogsBtn');
 const callLogsList = document.getElementById('callLogsList');
+const videoPlaceholder = document.getElementById('videoPlaceholder');
 
 joinBtn.addEventListener('click', () => {
     const username = usernameInput.value.trim();
@@ -63,8 +72,15 @@ async function initializeMedia(callType = 'video') {
         if (callType === 'video') {
             localVideo.srcObject = localStream;
             localVideo.style.display = 'block';
+            if (mobileLocalVideo) {
+                mobileLocalVideo.srcObject = localStream;
+                mobileLocalVideo.style.display = 'block';
+            }
         } else {
             localVideo.style.display = 'none';
+            if (mobileLocalVideo) {
+                mobileLocalVideo.style.display = 'none';
+            }
         }
         
         localStream.getVideoTracks().forEach(track => {
@@ -80,34 +96,59 @@ async function initializeMedia(callType = 'video') {
     }
 }
 
-function createUserElement(username) {
+function createUserElement(username, isMobile = false) {
     const userDiv = document.createElement('div');
-    userDiv.className = 'flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200';
-    userDiv.innerHTML = `
-        <div class="flex items-center space-x-3">
-            <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                </svg>
+    
+    if (isMobile) {
+        userDiv.className = 'flex items-center justify-between p-2 bg-discord-light hover:bg-discord-accent/20 rounded transition-colors duration-200';
+        userDiv.innerHTML = `
+            <div class="flex items-center space-x-2">
+                <div class="w-6 h-6 bg-discord-accent rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-3 h-3 text-white stroke-2"></i>
+                </div>
+                <div>
+                    <span class="font-medium text-discord-text text-sm">${username}</span>
+                    <div class="flex items-center space-x-1">
+                        <div class="w-1.5 h-1.5 bg-discord-success rounded-full"></div>
+                        <span class="text-xs text-discord-success font-medium">online</span>
+                    </div>
+                </div>
             </div>
-            <div>
-                <span class="font-medium text-gray-900">${username}</span>
-                <div class="w-2 h-2 bg-green-500 rounded-full inline-block ml-2"></div>
+            <div class="flex space-x-1">
+                <button onclick="startCall('${username}', 'audio')" class="w-6 h-6 bg-discord-success hover:bg-green-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Audio Call">
+                    <i data-lucide="phone" class="w-3 h-3 stroke-2"></i>
+                </button>
+                <button onclick="startCall('${username}', 'video')" class="w-6 h-6 bg-discord-accent hover:bg-blue-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Video Call">
+                    <i data-lucide="video" class="w-3 h-3 stroke-2"></i>
+                </button>
             </div>
-        </div>
-        <div class="flex space-x-2">
-            <button onclick="startCall('${username}', 'audio')" class="w-10 h-10 bg-green-600 hover:bg-green-700 text-white rounded-full flex items-center justify-center transition-colors duration-200" title="Audio Call">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                </svg>
-            </button>
-            <button onclick="startCall('${username}', 'video')" class="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition-colors duration-200" title="Video Call">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                </svg>
-            </button>
-        </div>
-    `;
+        `;
+    } else {
+        userDiv.className = 'flex items-center justify-between p-3 bg-discord-light hover:bg-discord-accent/10 rounded transition-colors duration-200';
+        userDiv.innerHTML = `
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-discord-accent rounded-full flex items-center justify-center">
+                    <i data-lucide="user" class="w-5 h-5 text-white stroke-2"></i>
+                </div>
+                <div>
+                    <span class="font-medium text-discord-text text-sm">${username}</span>
+                    <div class="flex items-center space-x-1 mt-0.5">
+                        <div class="w-2 h-2 bg-discord-success rounded-full"></div>
+                        <span class="text-xs text-discord-success font-medium">online</span>
+                    </div>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button onclick="startCall('${username}', 'audio')" class="w-8 h-8 bg-discord-success hover:bg-green-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Audio Call">
+                    <i data-lucide="phone" class="w-4 h-4 stroke-2"></i>
+                </button>
+                <button onclick="startCall('${username}', 'video')" class="w-8 h-8 bg-discord-accent hover:bg-blue-600 text-white rounded flex items-center justify-center transition-colors duration-200" title="Video Call">
+                    <i data-lucide="video" class="w-4 h-4 stroke-2"></i>
+                </button>
+            </div>
+        `;
+    }
+    
     return userDiv;
 }
 
@@ -150,19 +191,38 @@ async function startCall(targetUsername, callType) {
     peer.on('stream', (stream) => {
         console.log('Received remote stream:', stream);
         remoteStream = stream;
+        remoteVideo.srcObject = stream;
+        
+        // Hide placeholder and show remote video
+        if (videoPlaceholder) {
+            videoPlaceholder.style.display = 'none';
+        }
+        if (mobileVideoPlaceholder) {
+            mobileVideoPlaceholder.style.display = 'none';
+        }
         
         // Show/hide video elements based on call type
         if (currentCall.type === 'video') {
-            remoteVideo.srcObject = stream;
             remoteVideo.style.display = 'block';
+            if (mobileRemoteVideo) {
+                mobileRemoteVideo.srcObject = stream;
+                mobileRemoteVideo.style.display = 'block';
+            }
             // Ensure video plays (handle autoplay restrictions)  
             remoteVideo.play().catch(e => {
                 console.log('Autoplay prevented, user interaction required:', e);
             });
+            if (mobileRemoteVideo) {
+                mobileRemoteVideo.play().catch(e => {
+                    console.log('Mobile autoplay prevented:', e);
+                });
+            }
         } else {
-            // For audio calls, still set the stream but don't show video
-            remoteVideo.srcObject = stream;
+            // For audio calls, hide video but keep audio
             remoteVideo.style.display = 'none';
+            if (mobileRemoteVideo) {
+                mobileRemoteVideo.style.display = 'none';
+            }
         }
         
         showCallControls();
@@ -209,19 +269,38 @@ async function answerCall(signal, caller, callType, callId) {
     peer.on('stream', (stream) => {
         console.log('Received remote stream:', stream);
         remoteStream = stream;
+        remoteVideo.srcObject = stream;
+        
+        // Hide placeholder and show remote video
+        if (videoPlaceholder) {
+            videoPlaceholder.style.display = 'none';
+        }
+        if (mobileVideoPlaceholder) {
+            mobileVideoPlaceholder.style.display = 'none';
+        }
         
         // Show/hide video elements based on call type
         if (currentCall.type === 'video') {
-            remoteVideo.srcObject = stream;
             remoteVideo.style.display = 'block';
+            if (mobileRemoteVideo) {
+                mobileRemoteVideo.srcObject = stream;
+                mobileRemoteVideo.style.display = 'block';
+            }
             // Ensure video plays (handle autoplay restrictions)
             remoteVideo.play().catch(e => {
                 console.log('Autoplay prevented, user interaction required:', e);
             });
+            if (mobileRemoteVideo) {
+                mobileRemoteVideo.play().catch(e => {
+                    console.log('Mobile autoplay prevented:', e);
+                });
+            }
         } else {
-            // For audio calls, still set the stream but don't show video
-            remoteVideo.srcObject = stream;
+            // For audio calls, hide video but keep audio
             remoteVideo.style.display = 'none';
+            if (mobileRemoteVideo) {
+                mobileRemoteVideo.style.display = 'none';
+            }
         }
         
         showCallControls();
@@ -267,6 +346,23 @@ function endCall() {
     remoteVideo.style.display = 'none';
     localVideo.style.display = 'none';
     
+    if (mobileRemoteVideo) {
+        mobileRemoteVideo.srcObject = null;
+        mobileRemoteVideo.style.display = 'none';
+    }
+    if (mobileLocalVideo) {
+        mobileLocalVideo.srcObject = null;
+        mobileLocalVideo.style.display = 'none';
+    }
+    
+    // Show placeholder again
+    if (videoPlaceholder) {
+        videoPlaceholder.style.display = 'flex';
+    }
+    if (mobileVideoPlaceholder) {
+        mobileVideoPlaceholder.style.display = 'flex';
+    }
+    
     currentCall = null;
     hideCallControls();
     hideCallStatus();
@@ -276,10 +372,16 @@ function endCall() {
 
 function showCallControls() {
     endCallBtn.style.display = 'inline-block';
+    if (mobileEndCallBtn) {
+        mobileEndCallBtn.style.display = 'inline-block';
+    }
 }
 
 function hideCallControls() {
     endCallBtn.style.display = 'none';
+    if (mobileEndCallBtn) {
+        mobileEndCallBtn.style.display = 'none';
+    }
 }
 
 function showCallStatus(message) {
@@ -342,7 +444,14 @@ toggleVideo.addEventListener('click', () => {
             track.enabled = isVideoEnabled;
         });
     }
-    toggleVideo.classList.toggle('disabled', !isVideoEnabled);
+    
+    // Update desktop button appearance
+    const icon = toggleVideo.querySelector('i');
+    if (icon) {
+        icon.setAttribute('data-lucide', isVideoEnabled ? 'video' : 'video-off');
+        lucide.createIcons();
+    }
+    toggleVideo.style.opacity = isVideoEnabled ? '1' : '0.5';
 });
 
 toggleAudio.addEventListener('click', () => {
@@ -352,10 +461,60 @@ toggleAudio.addEventListener('click', () => {
             track.enabled = isAudioEnabled;
         });
     }
-    toggleAudio.classList.toggle('disabled', !isAudioEnabled);
+    
+    // Update desktop button appearance
+    const icon = toggleAudio.querySelector('i');
+    if (icon) {
+        icon.setAttribute('data-lucide', isAudioEnabled ? 'mic' : 'mic-off');
+        lucide.createIcons();
+    }
+    toggleAudio.style.opacity = isAudioEnabled ? '1' : '0.5';
 });
 
 endCallBtn.addEventListener('click', endCall);
+
+// Mobile controls event listeners
+if (mobileToggleVideo) {
+    mobileToggleVideo.addEventListener('click', () => {
+        isVideoEnabled = !isVideoEnabled;
+        if (localStream) {
+            localStream.getVideoTracks().forEach(track => {
+                track.enabled = isVideoEnabled;
+            });
+        }
+        
+        // Update button appearance
+        const icon = mobileToggleVideo.querySelector('i');
+        if (icon) {
+            icon.setAttribute('data-lucide', isVideoEnabled ? 'video' : 'video-off');
+            lucide.createIcons();
+        }
+        mobileToggleVideo.style.opacity = isVideoEnabled ? '1' : '0.5';
+    });
+}
+
+if (mobileToggleAudio) {
+    mobileToggleAudio.addEventListener('click', () => {
+        isAudioEnabled = !isAudioEnabled;
+        if (localStream) {
+            localStream.getAudioTracks().forEach(track => {
+                track.enabled = isAudioEnabled;
+            });
+        }
+        
+        // Update button appearance
+        const icon = mobileToggleAudio.querySelector('i');
+        if (icon) {
+            icon.setAttribute('data-lucide', isAudioEnabled ? 'mic' : 'mic-off');
+            lucide.createIcons();
+        }
+        mobileToggleAudio.style.opacity = isAudioEnabled ? '1' : '0.5';
+    });
+}
+
+if (mobileEndCallBtn) {
+    mobileEndCallBtn.addEventListener('click', endCall);
+}
 
 acceptCallBtn.addEventListener('click', () => {
     console.log('Accept button clicked, incomingCallData:', window.incomingCallData);
@@ -393,12 +552,39 @@ rejectCallBtn.addEventListener('click', () => {
 refreshLogsBtn.addEventListener('click', loadCallLogs);
 
 socket.on('updateUserList', (users) => {
-    usersList.innerHTML = '';
-    users.forEach(username => {
-        if (username !== currentUsername) {
-            usersList.appendChild(createUserElement(username));
-        }
-    });
+    // Update desktop users list
+    if (usersList) {
+        usersList.innerHTML = '';
+        users.forEach(username => {
+            if (username !== currentUsername) {
+                usersList.appendChild(createUserElement(username, false));
+            }
+        });
+    }
+    
+    // Update mobile users list
+    if (mobileUsersList) {
+        mobileUsersList.innerHTML = '';
+        users.forEach(username => {
+            if (username !== currentUsername) {
+                mobileUsersList.appendChild(createUserElement(username, true));
+            }
+        });
+    }
+    
+    // Update empty states
+    const hasOtherUsers = users.some(u => u !== currentUsername);
+    if (document.getElementById('emptyUsersState')) {
+        document.getElementById('emptyUsersState').style.display = hasOtherUsers ? 'none' : 'block';
+    }
+    if (mobileEmptyUsersState) {
+        mobileEmptyUsersState.style.display = hasOtherUsers ? 'none' : 'block';
+    }
+    
+    // Reinitialize icons after adding new elements
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
+    }
 });
 
 socket.on('incoming-call', (data) => {
