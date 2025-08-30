@@ -185,7 +185,13 @@ async function startCall(targetUsername, callType) {
     peer.on('stream', (stream) => {
         console.log('Received remote stream:', stream);
         remoteStream = stream;
+        
+        // Set stream for both desktop and mobile video elements
         remoteVideo.srcObject = stream;
+        if (mobileRemoteVideo) {
+            mobileRemoteVideo.srcObject = stream;
+            console.log('Mobile remote video srcObject set');
+        }
         
         // Hide placeholder and show remote video
         if (videoPlaceholder) {
@@ -199,15 +205,17 @@ async function startCall(targetUsername, callType) {
         if (currentCall.type === 'video') {
             remoteVideo.style.display = 'block';
             if (mobileRemoteVideo) {
-                mobileRemoteVideo.srcObject = stream;
                 mobileRemoteVideo.style.display = 'block';
+                console.log('Mobile remote video display set to block');
             }
             // Ensure video plays (handle autoplay restrictions)  
             remoteVideo.play().catch(e => {
                 console.log('Autoplay prevented, user interaction required:', e);
             });
             if (mobileRemoteVideo) {
-                mobileRemoteVideo.play().catch(e => {
+                mobileRemoteVideo.play().then(() => {
+                    console.log('Mobile remote video playing successfully');
+                }).catch(e => {
                     console.log('Mobile autoplay prevented:', e);
                 });
             }
@@ -263,7 +271,13 @@ async function answerCall(signal, caller, callType, callId) {
     peer.on('stream', (stream) => {
         console.log('Received remote stream:', stream);
         remoteStream = stream;
+        
+        // Set stream for both desktop and mobile video elements
         remoteVideo.srcObject = stream;
+        if (mobileRemoteVideo) {
+            mobileRemoteVideo.srcObject = stream;
+            console.log('Mobile remote video srcObject set (answer call)');
+        }
         
         // Hide placeholder and show remote video
         if (videoPlaceholder) {
@@ -277,16 +291,18 @@ async function answerCall(signal, caller, callType, callId) {
         if (currentCall.type === 'video') {
             remoteVideo.style.display = 'block';
             if (mobileRemoteVideo) {
-                mobileRemoteVideo.srcObject = stream;
                 mobileRemoteVideo.style.display = 'block';
+                console.log('Mobile remote video display set to block (answer call)');
             }
             // Ensure video plays (handle autoplay restrictions)
             remoteVideo.play().catch(e => {
                 console.log('Autoplay prevented, user interaction required:', e);
             });
             if (mobileRemoteVideo) {
-                mobileRemoteVideo.play().catch(e => {
-                    console.log('Mobile autoplay prevented:', e);
+                mobileRemoteVideo.play().then(() => {
+                    console.log('Mobile remote video playing successfully (answer call)');
+                }).catch(e => {
+                    console.log('Mobile autoplay prevented (answer call):', e);
                 });
             }
         } else {
