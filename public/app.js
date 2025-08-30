@@ -193,20 +193,20 @@ async function startCall(targetUsername, callType) {
             console.log('Mobile remote video srcObject set');
         }
         
-        // Hide placeholder and show remote video
-        if (videoPlaceholder) {
-            videoPlaceholder.style.display = 'none';
-        }
-        if (mobileVideoPlaceholder) {
-            mobileVideoPlaceholder.style.display = 'none';
-        }
-        
         // Show/hide video elements based on call type
         if (currentCall.type === 'video') {
             remoteVideo.style.display = 'block';
             if (mobileRemoteVideo) {
                 mobileRemoteVideo.style.display = 'block';
                 console.log('Mobile remote video display set to block');
+            }
+            
+            // Hide placeholder after setting up video
+            if (videoPlaceholder) {
+                videoPlaceholder.style.display = 'none';
+            }
+            if (mobileVideoPlaceholder) {
+                mobileVideoPlaceholder.style.display = 'none';
             }
             // Ensure video plays (handle autoplay restrictions)  
             remoteVideo.play().catch(e => {
@@ -279,20 +279,20 @@ async function answerCall(signal, caller, callType, callId) {
             console.log('Mobile remote video srcObject set (answer call)');
         }
         
-        // Hide placeholder and show remote video
-        if (videoPlaceholder) {
-            videoPlaceholder.style.display = 'none';
-        }
-        if (mobileVideoPlaceholder) {
-            mobileVideoPlaceholder.style.display = 'none';
-        }
-        
         // Show/hide video elements based on call type
         if (currentCall.type === 'video') {
             remoteVideo.style.display = 'block';
             if (mobileRemoteVideo) {
                 mobileRemoteVideo.style.display = 'block';
                 console.log('Mobile remote video display set to block (answer call)');
+            }
+            
+            // Hide placeholder after setting up video
+            if (videoPlaceholder) {
+                videoPlaceholder.style.display = 'none';
+            }
+            if (mobileVideoPlaceholder) {
+                mobileVideoPlaceholder.style.display = 'none';
             }
             // Ensure video plays (handle autoplay restrictions)
             remoteVideo.play().catch(e => {
@@ -393,6 +393,11 @@ function showCallControls() {
     const mobileEndCallLabelContainer = document.getElementById('mobileEndCallLabelContainer');
     if (mobileEndCallLabelContainer) {
         mobileEndCallLabelContainer.classList.remove('hidden');
+    }
+    
+    // Reinitialize Lucide icons to ensure proper centering
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+        lucide.createIcons();
     }
 }
 
